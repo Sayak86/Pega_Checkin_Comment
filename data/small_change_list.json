@@ -1,0 +1,41 @@
+{
+  "pxObjClass": "Code-Pega-List",
+  "pxResultCount": "200",
+  "pxResults": [
+    {
+      "pxChangeType": "Modified",
+      "pxCurrentReference": ".pySteps(2).pyParamArray(1).PropertiesName",
+      "pxCurrentValue": ".AR_VALUE_1",
+      "pxObjClass": "Embed-Compare-Change-String",
+      "pxPageLabel": "Parameter",
+      "pxPreviousReference": ".pySteps(2).pyParamArray(1).PropertiesName",
+      "pxPreviousValue": ".Ref1",
+      "pxPropertyLabel": "PropertiesName",
+      "pxPropertyName": "PropertiesName",
+      "pyCompareLabel": "Parameter 1 PropertiesName",
+      "pxTextChangeList": [
+        {
+          "pxChangeType": "Equals",
+          "pxObjClass": "Embed-Compare-Change-String",
+          "pxText": "."
+        },
+        {
+          "pxChangeType": "Insert",
+          "pxObjClass": "Embed-Compare-Change-String",
+          "pxText": "AR"
+        },
+        {
+          "pxChangeType": "Delete",
+          "pxObjClass": "Embed-Compare-Change-String",
+          "pxText": "Ref1"
+        },
+        {
+          "pxChangeType": "Insert",
+          "pxObjClass": "Embed-Compare-Change-String",
+          "pxText": "VALUE_1"
+            }
+          ]
+        }
+      ]
+    }
+    

@@ -1,0 +1,12 @@
+{
+  "llm_config": {
+  "backupModel": "xxxxx",
+	"model": "gpt-4o", 
+	"temperature": 0.2,
+  "max_tokens": 5000
+  },
+  "prompts":{
+    "generic": "generic_prompt.md",
+    "prompts_path": "C:\\Users\\sakpa\\Projects\\Upgrad\\Agentic AI\\Pega_Checkin_Comment\\src\\prompts"
+  }
+}
