@@ -31,6 +31,7 @@ def get_client()->ChatOpenAI:
         model=llm_config['model'],
         temperature=llm_config['temperature'],
         max_tokens=llm_config['max_tokens'],
+        timeout=llm_config['timeout'],
 
     ).with_structured_output(ChunkReponseModel)
     return llm

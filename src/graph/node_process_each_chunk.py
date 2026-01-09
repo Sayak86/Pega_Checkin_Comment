@@ -47,13 +47,6 @@ def node_process_each_chunk(state: GenCommentState) -> dict:
 
         return {"summaries": [result]}
     except Exception as e:
-        logger.error(f"Error processing chunk {chunk_id}: {e}")
-        return {"errors": [
-            {
-            "chunk_id": chunk_id,  
-            "error": str(e), 
-            "chunk_data": chunk,
-            
-            }
-        ]
-        }
+        
+        errorDef = {"chunk_id": chunk_id, "error": str(e), "chunk_data": chunk}
+        return {"errors": [errorDef]}

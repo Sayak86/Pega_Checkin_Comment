@@ -15,9 +15,11 @@ class CheckInCommentRequest(BaseModel):
     RuleDiff: Dict[str, Any]
     RuleType: str
 
+from typing import List
+
 class CheckInCommentResponse(BaseModel):
     comment: Optional[str] = None
-    error: Optional[str] = None
+    errors: Optional[list] = None
 
 @router.post("/get_checkin_comment", response_model=CheckInCommentResponse)
 def generate_checkin_comment(request: CheckInCommentRequest):
@@ -46,8 +48,14 @@ def generate_checkin_comment(request: CheckInCommentRequest):
             raise ValueError(f"ruleType {ruleType} is not recognized.")
         
         # Call the workflow process
-        result = wokflow_process(comparedResultsJson, ruleType)
+        # If result is not a string, treat it as an error. 
 
-        return CheckInCommentResponse(comment=result, error=None)
+        result = wokflow_process(comparedResultsJson, ruleType)
+        if not isinstance(result, str):
+            return CheckInCommentResponse(comment=None, errors=[{"error": str(result)}])
+
+
+        return CheckInCommentResponse(comment=result, errors=None)
     except Exception as e:
-        return CheckInCommentResponse(comment=None, error=str(e))
+        logger.error(f"Error generating check-in comment: {str(e)}")
+        return CheckInCommentResponse(comment=None, errors=[{"error": str(e)}])

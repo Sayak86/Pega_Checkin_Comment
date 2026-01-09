@@ -22,6 +22,8 @@ pxResult = Dict[str, Any]     -- a single pxResult
 """
 # Define a type for pxResult -- a single pxResult
 pxResult = Dict[str, Any]
+# error are list of error dictionaries, error dictionary may have keys like "chunkId", "errorMessage", "chunk".
+errorDef = Dict[str, Any]
 
 
 class GenCommentState(TypedDict):
@@ -32,6 +34,6 @@ class GenCommentState(TypedDict):
     summaries: Annotated[List[dict[str, Any]], operator.add]  # List of summaries for each chunk
     final_summary: str
     ruleType:str
-    errors: Annotated[List[dict[str,Any]], operator.add]
+    errors: Annotated[List[errorDef], operator.add]
 
 
