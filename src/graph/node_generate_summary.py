@@ -28,4 +28,4 @@ def node_generate_summary(state: GenCommentState) -> dict:
 
     
     logger.debug(f"Final Summary Generated:\n{final_summary}\n")
-    return {"final_summary": state["final_summary"]}
+    return {"final_summary": final_summary}

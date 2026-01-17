@@ -51,6 +51,8 @@ def generate_checkin_comment(request: CheckInCommentRequest):
         # If result is not a string, treat it as an error. 
 
         result = wokflow_process(comparedResultsJson, ruleType)
+        # add a debug log
+        logger.debug(f"\n\nWorkflow process result:\n\n {result}")
         if not isinstance(result, str):
             return CheckInCommentResponse(comment=None, errors=[{"error": str(result)}])
 

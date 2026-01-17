@@ -40,6 +40,15 @@ def node_process_each_chunk(state: GenCommentState) -> dict:
             "chunk_id": chunk_id,
         })
 
+        # Step 5 - Convert pydantic model to dict if needed
+        if hasattr(result, 'model_dump'):
+            result = result.model_dump()
+
+        # Map LLM fields to expected fields
+        result = {
+        "chunkId": result.get("chunk_id"),  # or chunk_id depending on LLM output
+        "summaryText": result.get("changeSummary")  # or the actual field name
+    }
 
         # Log the end of processing with a timestamp
         end_time = datetime.now()

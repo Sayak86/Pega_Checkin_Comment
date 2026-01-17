@@ -4,10 +4,13 @@ from langchain_core.prompts import ChatPromptTemplate
 from functools import partial
 
 def load_prompt(ruleType:str)->ChatPromptTemplate:
+    # lowercase ruleType to maintain consistency
+    ruleType = ruleType.lower()
+    root_dir  = Path(__file__).parent.parent # /app/src
     config = load_config()
-    prompts_dir = Path(config["prompts"]['prompts_path'])
-    generic_prompt_file = prompts_dir / config["prompts"]['generic']
-    specific_prompt_file = prompts_dir / f"{ruleType}_prompt.md"
+    prompts_dir = Path(config["prompts"]['prompts_path']) # prompts
+    generic_prompt_file = root_dir / prompts_dir / config["prompts"]['generic'] # generic_prompt.md
+    specific_prompt_file = root_dir / prompts_dir / f"{ruleType}_prompt.md" # prompts/activity_prompt.md
     # Read generic prompt (not used currently, but can be extended)
     if not generic_prompt_file.exists():
         raise FileNotFoundError(f"Generic prompt file {generic_prompt_file} does not exist.")
