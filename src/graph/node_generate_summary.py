@@ -27,5 +27,6 @@ def node_generate_summary(state: GenCommentState) -> dict:
         logger.debug(f"Chunk ID: {summary.get('chunkId')} Summary: {summary_text}\n")
 
     
+    
     logger.debug(f"Final Summary Generated:\n{final_summary}\n")
     return {"final_summary": final_summary}
