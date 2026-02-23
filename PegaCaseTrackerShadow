@@ -1,0 +1,55 @@
+(function PegaCaseTrackerShadow() {
+
+  // ══════════════════════════════════════════
+  // STEP 1: CONFIGURATION
+  // Shorter intervals for testing only.
+  // Production will use 30000 and 60000.
+  // ══════════════════════════════════════════
+  var HEARTBEAT_INTERVAL = 10000;   // Check every 10 seconds (production: 30s)
+  var IDLE_TIMEOUT = 15000;         // Idle after 15 seconds (production: 60s)
+  var ENABLED = true;               // Set false to stop everything
+
+  // ══════════════════════════════════════════
+  // STEP 2: INITIALIZE STATE
+  // lastActivity = "when did user last do
+  // anything?" — starts as "right now"
+  // ══════════════════════════════════════════
+  var lastActivity = Date.now();
+  var sessionId = crypto.randomUUID();
+  var heartbeatCount = 0;
+  var skippedCount = { hidden: 0, noCase: 0, idle: 0 };
+
+  // ══════════════════════════════════════════
+  // STEP 3: ACTIVITY LISTENERS
+  // Every time user moves mouse, types,
+  // scrolls, or clicks — update lastActivity.
+  // { passive: true } = zero CPU impact.
+  // ══════════════════════════════════════════
+  document.addEventListener("mousemove", function() {
+    lastActivity = Date.now();
+  }, { passive: true });
+
+  document.addEventListener("keydown", function() {
+    lastActivity = Date.now();
+  }, { passive: true });
+
+  document.addEventListener("scroll", function() {
+    lastActivity = Date.now();
+  }, { passive: true });
+
+  document.addEventListener("click", function() {
+    lastActivity = Date.now();
+  }, { passive: true });
+
+  // ══════════════════════════════════════════
+  // STEP 4: EMIT — CONSOLE ONLY
+  // In production this becomes sendBeacon.
+  // Right now it just prints to console.
+  // ══════════════════════════════════════════
+  function emit(eventType, caseId, context) {
+    console.log(
+      "📤 [SHADOW]",
+      eventType,
+      "| Case:", caseId,
+      "| Time:", new Date().toLocaleTimeString(),
+      context ? "| Detail: " + JSON.stringify(cont
