@@ -1,0 +1,153 @@
+<script>
+// ══════════════════════════════════════════
+// Guard: Initialize ONLY ONCE
+// If Pega reloads the control, this prevents
+// duplicate timers and listeners.
+// ══════════════════════════════════════════
+if (!window._caseTrackerInitialized) {
+  window._caseTrackerInitialized = true;
+
+  // ── CONFIGURATION ──
+  window._caseTracker = {
+    HEARTBEAT_INTERVAL: 10000,   // 10s for testing (production: 30000)
+    IDLE_TIMEOUT: 15000,         // 15s for testing (production: 60000)
+    ENABLED: true,
+    lastActivity: Date.now(),
+    sessionId: crypto.randomUUID(),
+    heartbeatCount: 0,
+    skippedCount: { hidden: 0, noCase: 0, idle: 0 },
+    timerId: null
+  };
+
+  var t = window._caseTracker;
+
+  // ── ACTIVITY LISTENERS (once only) ──
+  document.addEventListener("mousemove", function() {
+    t.lastActivity = Date.now();
+  }, { passive: true });
+
+  document.addEventListener("keydown", function() {
+    t.lastActivity = Date.now();
+  }, { passive: true });
+
+  document.addEventListener("scroll", function() {
+    t.lastActivity = Date.now();
+  }, { passive: true });
+
+  document.addEventListener("click", function() {
+    t.lastActivity = Date.now();
+  }, { passive: true });
+
+  // ── EMIT (shadow mode — console only) ──
+  function emit(eventType, caseId, context) {
+    console.log(
+      "📤 [SHADOW]",
+      eventType,
+      "| Case:", caseId,
+      "| Time:", new Date().toLocaleTimeString(),
+      context ? "| Detail: " + JSON.stringify(context) : ""
+    );
+  }
+
+  // ── HEARTBEAT TIMER (once only) ──
+  t.timerId = setInterval(function() {
+
+    if (!t.ENABLED) return;
+
+    // GATE 1a: Browser tab visible?
+    if (document.hidden) {
+      t.skippedCount.hidden++;
+      console.log("⛔ GATE 1a — tab hidden |", t.skippedCount.hidden, "times");
+      return;
+    }
+
+    // GATE 1b: Case open?
+    var caseId;
+    try { caseId = pyID; } catch(e) { caseId = null; }
+    if (!caseId) {
+      t.skippedCount.noCase++;
+      console.log("⛔ GATE 1b — no case |", t.skippedCount.noCase, "times");
+      return;
+    }
+
+    // GATE 2: User active?
+    var idleSeconds = ((Date.now() - t.lastActivity) / 1000).toFixed(0);
+    if (Date.now() - t.lastActivity > t.IDLE_TIMEOUT) {
+      t.skippedCount.idle++;
+      console.log("⛔ GATE 2 — idle", idleSeconds + "s |", t.skippedCount.idle, "times");
+      return;
+    }
+
+    // ALL GATES PASSED
+    t.heartbeatCount++;
+    emit("HEARTBEAT", caseId, {
+      heartbeat: t.heartbeatCount,
+      idle: idleSeconds + "s"
+    });
+
+  }, t.HEARTBEAT_INTERVAL);
+
+  // ── ACTION TRACKER (for existing triggers) ──
+  window.trackCaseAction = function(eventType, context) {
+    if (!t.ENABLED) return;
+    var caseId;
+    try { caseId = pyID; } catch(e) { caseId = null; }
+    if (!caseId) return;
+    emit(eventType, caseId, context);
+  };
+
+  // ── STATUS CHECK ──
+  window.trackerStatus = function() {
+    console.log("═══════════════════════════════════════");
+    console.log("📊 TRACKER STATUS");
+    console.log("   Heartbeats sent:    " + t.heartbeatCount);
+    console.log("   Skipped (hidden):   " + t.skippedCount.hidden);
+    console.log("   Skipped (no case):  " + t.skippedCount.noCase);
+    console.log("   Skipped (idle):     " + t.skippedCount.idle);
+    console.log("   Active time:        " + (t.heartbeatCount * t.HEARTBEAT_INTERVAL / 1000) + "s");
+    console.log("   Tab visible:        " + !document.hidden);
+    var c; try { c = pyID; } catch(e) { c = "none"; }
+    console.log("   Active case:        " + (c || "none"));
+    console.log("═══════════════════════════════════════");
+  };
+
+  // ── KILL SWITCH ──
+  window.trackerStop = function() {
+    t.ENABLED = false;
+    clearInterval(t.timerId);
+    console.log("🛑 Tracker stopped.");
+  };
+
+  console.log("═══════════════════════════════════════");
+  console.log("🔬 SHADOW TRACKER — initialized");
+  console.log("   trackerStatus() — check summary");
+  console.log("   trackerStop()   — kill everything");
+  console.log("═══════════════════════════════════════");
+
+} else {
+  console.log("✅ Tracker already running — skipped duplicate init");
+}
+</script>
+```
+
+---
+
+## Where to Place This in Pega
+
+You have three options — pick whichever fits your app:
+```
+Option A:  Harness (best — loads once per session)
+           → pyCaseWorkerHarness or your custom harness
+           → Add a Section with this HTML block
+           → Loads when investigator logs in
+           → Never reloads unless full page refresh
+
+Option B:  Case Type Section (loads per case open)
+           → Add to your main case wrapper section
+           → The guard (if !window._caseTrackerInitialized)
+             prevents duplicate initialization
+
+Option C:  Portal Header / Footer
+           → If you have a custom portal
+           → Add as an HTML fragment
+           → Loads once, persists across all navigation
