@@ -1,6 +1,7 @@
 from typing import Any, Dict
 from langgraph.graph import StateGraph,START,END
 from marshmallow import pprint
+from graph.node_preprocess import node_preprocess
 from graph.node_perform_chunk import node_perform_chunk
 from graph.router_split_Chunks_To_Task import router_split_chunks_to_tasks
 from graph.node_process_each_chunk import node_process_each_chunk
@@ -26,8 +27,8 @@ def wokflow_process(comparedResultsJson: Dict[str, Any], ruleType: str) -> str:
     # logging
 
 
-    # Step 1: Add first node to perform chunking
     graph = StateGraph(GenCommentState)
+    graph.add_node("node_preprocess", node_preprocess)
     graph.add_node("node_perform_chunk", node_perform_chunk)
     # Step 2: Add node to process each chunk
     graph.add_node("node_process_each_chunk", node_process_each_chunk)
@@ -38,8 +39,8 @@ def wokflow_process(comparedResultsJson: Dict[str, Any], ruleType: str) -> str:
 
 
 
-    # Define edges
-    graph.add_edge(START, "node_perform_chunk")
+    graph.add_edge(START, "node_preprocess")
+    graph.add_edge("node_preprocess", "node_perform_chunk")
     graph.add_conditional_edges("node_perform_chunk", router_split_chunks_to_tasks)
     graph.add_conditional_edges("node_process_each_chunk", validate_chunk_response)
     graph.add_edge("node_error_handler", END)
