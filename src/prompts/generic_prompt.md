@@ -10,8 +10,12 @@ You will be provided a json. This json is created out of the comparison between 
 Each element has been preprocessed to include `resolved_` prefixed fields for any hierarchical path. 
 For example: `resolved_pxCurrentReference` is the human-readable version of `pxCurrentReference`.
 Use the resolved_ fields directly in your output — they contain the clean, readable paths.
-Also keep a track of {chunk_id}, we may need this later.
-here is the input:
+
+Context: {chunk_context}
+
+Chunk ID: {chunk_id}
+
+Data:
 {chunk_data}
 
 ## Specific Instructions for {ruleType}
