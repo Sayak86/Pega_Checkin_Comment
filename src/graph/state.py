@@ -31,6 +31,9 @@ class GenCommentState(TypedDict):
     chunks: List[List[pxResult]] # Chunks are collection of chunk
     chunk: List[pxResult]      # A single chunk
     chunk_id: int # ID of the chunk being processed
+    total_chunks: int # Total number of chunks
+    total_changes: int # Total number of pxResults
+    chunk_context: str # Context string for current chunk
     summaries: Annotated[List[dict[str, Any]], operator.add]  # List of summaries for each chunk
     final_summary: str
     ruleType:str

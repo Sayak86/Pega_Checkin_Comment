@@ -14,15 +14,16 @@ from llm.loadPrompt import load_prompt
 def node_process_each_chunk(state: GenCommentState) -> dict:
     """
     Process each chunk of comparison results.
-    This function simulates processing by summarizing the chunk.
+    Analyzes the chunk via LLM and generates a summary.
     """
     chunk = state['chunk']
     chunk_id = state["chunk_id"]
     ruleType = state["ruleType"]
+    chunk_context = state.get("chunk_context", "")
 
     # Log the start of processing with a timestamp
     start_time = datetime.now()
-    logger.debug(f"[START] Processing chunk {chunk_id} at {start_time}. RuleType: {ruleType}")
+    logger.debug(f"[START] Processing {chunk_context}. RuleType: {ruleType}")
 
     try:
         # Step 1 - instantiate LLM client
@@ -32,12 +33,13 @@ def node_process_each_chunk(state: GenCommentState) -> dict:
         prompt_template = load_prompt(ruleType)
 
         # Step 3 - Create a chain
-        chain = prompt_template | llm 
+        chain = prompt_template | llm
 
         # Step 4 - Execute the chain
         result = chain.invoke({
             "chunk_data": chunk,
             "chunk_id": chunk_id,
+            "chunk_context": chunk_context,
         })
 
         # Step 5 - Convert pydantic model to dict if needed

@@ -5,3 +5,7 @@ class ChunkReponseModel(BaseModel):
     changeSummary:str = Field(description="Summary of changes in the chunk")
     error:str = Field(default="",description="Error message if any during processing")
     retry_count :int = Field(default=0,description="Number of retries attempted")
+
+class ConsolidationResponseModel(BaseModel):
+    checkin_comment:str = Field(description="Final consolidated check-in comment")
+    error:str = Field(default="",description="Error message if any during consolidation")
