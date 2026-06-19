@@ -6,7 +6,7 @@ from llm.loadPrompt import load_prompt
 from config import load_config
 from dotenv import load_dotenv
 import os
-from llm.llmresponsemodel import ChunkReponseModel
+from llm.llmresponsemodel import ChunkReponseModel, ConsolidationResponseModel
 """
     Here we will build the chain for LLM execution
 """
@@ -37,6 +37,22 @@ def get_client()->ChatOpenAI:
     return llm
 
 
-    
+def get_consolidation_client()->ChatOpenAI:
+    """
+    Returns an LLM instance for consolidation (merging chunk summaries).
+    Same config as the main client but bound to ConsolidationResponseModel.
+    """
+    load_dotenv()
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if not openai_api_key:
+        raise ValueError("OPENAI_API_KEY not found in environment variables.")
 
-
+    config = load_config()
+    llm_config = config['llm_config']
+    llm = ChatOpenAI(
+        model=llm_config['model'],
+        temperature=llm_config['temperature'],
+        max_tokens=llm_config['max_tokens'],
+        timeout=llm_config['timeout'],
+    ).with_structured_output(ConsolidationResponseModel)
+    return llm
